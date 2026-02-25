@@ -1,0 +1,83 @@
+name: Update Calendar ICS Files
+
+on:
+  schedule:
+    - cron: '0 0 1 12 *'
+  
+  workflow_dispatch:
+    inputs:
+      target_year:
+        description: '目标年份'
+        required: false
+        type: number
+
+jobs:
+  update-calendar:
+    runs-on: ubuntu-latest
+    
+    permissions:
+      contents: write
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      
+      - name: Calculate target year
+        id: calc_year
+        run: |
+          if [[ -n "${{ github.event.inputs.target_year }}" ]]; then
+            echo "year=${{ github.event.inputs.target_year }}" >> $GITHUB_OUTPUT
+          else
+            CURRENT_YEAR=$(date +'%Y')
+            NEXT_YEAR=$((CURRENT_YEAR + 1))
+            echo "year=$NEXT_YEAR" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: Update endYear in script
+        run: |
+          sed -i "s/const endYear = [0-9]*/const endYear = ${{ steps.calc_year.outputs.year }}/" calendar-script.js
+          
+          echo "Updated endYear to ${{ steps.calc_year.outputs.year }}"
+      
+      - name: Install dependencies
+        run: |
+          if [ ! -d "./1.7.6" ]; then
+            mkdir -p ./1.7.6
+            curl -o ./1.7.6/lunar.js https://raw.githubusercontent.com/6tail/lunar-javascript/master/1.7.6/lunar.js
+          fi
+      
+      - name: Run calendar script
+        run: node calendar-script.js
+      
+      - name: Check for changes
+        id: git_check
+        run: |
+          git add .
+          if git diff --staged --quiet; then
+            echo "changed=false" >> $GITHUB_OUTPUT
+          else
+            echo "changed=true" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: Commit and push changes
+        if: steps.git_check.outputs.changed == 'true'
+        run: |
+          git config --global user.name 'GitHub Action'
+          git config --global user.email 'action@github.com'
+          git commit -m "chore: update calendar files for ${{ steps.calc_year.outputs.year }}"
+          git push
+      
+      - name: Create Release
+        if: steps.git_check.outputs.changed == 'true'
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: calendar-${{ steps.calc_year.outputs.year }}
+          name: "Calendar Files ${{ steps.calc_year.outputs.year }}"
+          files: |
+            *.ics
+          generate_release_notes: true
