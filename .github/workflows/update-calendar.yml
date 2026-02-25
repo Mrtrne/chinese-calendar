@@ -40,7 +40,7 @@ jobs:
       
       - name: Update endYear in script
         run: |
-          sed -i "s/const endYear = [0-9]*/const endYear = ${{ steps.calc_year.outputs.year }}/" calendar-script.js
+          sed -i "s/const endYear = [0-9]\+/const endYear = ${{ steps.calc_year.outputs.year }}/" calendar-script.js
           
           echo "Updated endYear to ${{ steps.calc_year.outputs.year }}"
       
