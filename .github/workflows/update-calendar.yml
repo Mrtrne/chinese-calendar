@@ -47,13 +47,6 @@ jobs:
       - name: Set environment variable
         run: echo "END_YEAR=${{ steps.calc_year.outputs.year }}" >> $GITHUB_ENV
 
-      - name: Install dependencies
-        run: |
-          if [ ! -d "./1.7.6" ]; then
-            mkdir -p ./1.7.6
-            curl -o ./1.7.6/lunar.js https://raw.githubusercontent.com/6tail/lunar-javascript/master/1.7.6/lunar.js
-          fi
-
       - name: Run calendar script
         run: node calendar-script.js
 
@@ -80,7 +73,7 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           tag_name: calendar-${{ steps.calc_year.outputs.year }}
-          name: "Calendar Files ${{ steps.calc_year.outputs.year }}"
+          name: "Calendar ${{ steps.calc_year.outputs.year }}"
           files: |
             *.ics
           generate_release_notes: true

@@ -18,7 +18,7 @@ const { SolarMonth } = require('./1.7.6/lunar.js')
 const fs = require('fs')
 const https = require('https')
 
-const startYear = 2025
+const startYear = 2024
 const endYear = process.env.END_YEAR
 
 async function main() {
