@@ -67,8 +67,8 @@ jobs:
       - name: Commit and push changes
         if: steps.git_check.outputs.changed == 'true'
         run: |
-          git config --global user.name 'GitHub Action'
-          git config --global user.email 'action@github.com'
+          git config --global user.name 'Donny Yale'
+          git config --global user.email 'donny@qmdeve.com'
           git commit -m "chore: update calendar files for ${{ steps.calc_year.outputs.year }}"
           git push
       
