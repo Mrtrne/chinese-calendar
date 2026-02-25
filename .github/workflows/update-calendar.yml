@@ -2,7 +2,7 @@ name: Update Calendar ICS Files
 
 on:
   schedule:
-    - cron: "0 0 1 12 *"
+    - cron: "0 0 20 12 *"
 
   workflow_dispatch:
     inputs:
