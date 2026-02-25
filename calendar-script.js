@@ -19,7 +19,7 @@ const fs = require('fs')
 const https = require('https')
 
 const startYear = 2025
-const endYear = process.env.END_YEAR ? parseInt(process.env.END_YEAR) : 2027
+const endYear = process.env.END_YEAR
 
 async function main() {
   for (const item of configGroup) {
